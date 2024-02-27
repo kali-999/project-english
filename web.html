@@ -1,16 +1,52 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypted Message Sender</title>
 </head>
-
-<title> </title>
-
 <body>
-  
+    <h1>Send Encrypted Message</h1>
+    <form id="message-form">
+        <label for="recipient">Recipient:</label>
+        <input type="text" id="recipient" name="recipient" required><br><br>
+        
+        <label for="message">Message:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+        
+        <button type="submit">Send Encrypted Message</button>
+    </form>
+
+    <script>
+        document.getElementById('message-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const recipient = document.getElementById('recipient').value;
+            const message = document.getElementById('message').value;
+
+            // Generate a symmetric key
+            const key = await window.crypto.subtle.generateKey(
+                { name: 'AES-GCM', length: 256 },
+                true,
+                ['encrypt', 'decrypt']
+            );
+
+            // Convert the message to a Uint8Array
+            const messageUint8 = new TextEncoder().encode(message);
+
+            // Encrypt the message using the symmetric key
+            const encryptedData = await window.crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: window.crypto.getRandomValues(new Uint8Array(12)) },
+                key,
+                messageUint8
+            );
+
+            // Convert the encrypted data to a base64 string
+            const encryptedMessage = btoa(String.fromCharCode(...new Uint8Array(encryptedData)));
+
+            // Send the encrypted message to the recipient (replace this with your actual sending mechanism)
+            alert(`Encrypted message sent to ${recipient}: ${encryptedMessage}`);
+        });
+    </script>
 </body>
 </html>
-   
